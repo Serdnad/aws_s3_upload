@@ -1,4 +1,4 @@
-## [1.1.1] - 3/20/2021
+## [1.1.2] - 3/20/2021
 
 Fix returned url when using custom filename.
 
