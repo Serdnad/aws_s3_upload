@@ -1,6 +1,6 @@
 name: aws_s3_upload
 description: A simple, convenient package for uploading to S3.
-version: 1.1.0
+version: 1.1.1
 homepage: https://github.com/Serdnad/aws_s3_upload
 
 environment:

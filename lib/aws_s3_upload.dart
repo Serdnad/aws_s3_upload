@@ -60,7 +60,7 @@ class AwsS3 {
     try {
       final res = await req.send();
 
-      if (res.statusCode == 204) return '$endpoint/$destDir/${path.basename(file.path)}';
+      if (res.statusCode == 204) return uploadDest;
     } catch (e) {
       print(e.toString());
     }
