@@ -1,0 +1,27 @@
+name: aws_s3_upload
+description: A simple, convenient package for uploading to S3.
+version: 1.0.0
+author: Andres Gutierrez
+homepage:
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  amazon_cognito_identity_dart_2: ^0.1.25+1
+  http: ^0.12.2
+  path: ^1.7.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter.
+flutter:
