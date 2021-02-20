@@ -1,3 +1,7 @@
+## [1.1.0] - 3/20/2021
+
+Add support for uploading with a filename different from the file's current filename.
+
 ## [1.0.2] - 3/20/2021
 
 Update documentation to reflect class renaming.
