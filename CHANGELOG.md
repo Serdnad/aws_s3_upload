@@ -1,3 +1,11 @@
+## [1.0.2] - 3/20/2021
+
+Update documentation to reflect class renaming.
+
+## [1.0.1] - 3/20/2021
+
+Remove leftover template placeholders and restructure more logically.
+
 ## [1.0.0] - 3/20/2021
 
 Initial Release

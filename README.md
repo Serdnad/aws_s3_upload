@@ -8,7 +8,7 @@ _Heavily_ inspired by [this stackoverflow answer](https://stackoverflow.com/a/54
 
 Having created credentials on AWS, upload a file like so:
 ```dart
-S3.uploadFile(
+AwsS3.uploadFile(
   accessKey: "AKxxxxxxxxxxxxx",
   secretKey: "xxxxxxxxxxxxxxxxxxxxxxxxxx",
   file: File("path_to_file"),
