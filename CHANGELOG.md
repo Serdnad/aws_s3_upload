@@ -1,3 +1,7 @@
+## [1.2.0] - 5/9/2021
+
+Null safety and updated dependencies.
+
 ## [1.1.2] - 3/20/2021
 
 Fix returned url when using custom filename.

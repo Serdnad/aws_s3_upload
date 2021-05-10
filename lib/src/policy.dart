@@ -20,7 +20,7 @@ class Policy {
     String accessKeyId,
     int expiryMinutes,
     int maxFileSize, {
-    String region,
+    String region = 'us-east-1',
   }) {
     final datetime = SigV4.generateDatetime();
     final expiration = (DateTime.now()).add(Duration(minutes: expiryMinutes)).toUtc().toString().split(' ').join('T');

@@ -11,29 +11,28 @@ import './src/policy.dart';
 /// Convenience class for uploading files to AWS S3
 class AwsS3 {
   /// Upload a file, returning the file's public URL on success.
-  static Future<String> uploadFile(
-      {
+  static Future<String?> uploadFile({
+    /// AWS access key
+    required String accessKey,
 
-      /// AWS access key
-      String accessKey,
+    /// AWS secret key
+    required String secretKey,
 
-      /// AWS secret key
-      String secretKey,
+    /// The name of the S3 storage bucket to upload  to
+    required String bucket,
 
-      /// The name of the S3 storage bucket to upload  to
-      String bucket,
+    /// The file to upload
+    required File file,
 
-      /// The path to upload the file to (e.g. "uploads/public"). Defaults to the root "directory"
-      String destDir,
+    /// The path to upload the file to (e.g. "uploads/public"). Defaults to the root "directory"
+    String destDir = '',
 
-      /// The AWS region. Must be formatted correctly, e.g. us-west-1
-      String region = 'us-east-2',
+    /// The AWS region. Must be formatted correctly, e.g. us-west-1
+    String region = 'us-east-2',
 
-      /// The file to upload
-      File file,
-
-      /// The filename to upload as. If null, defaults to the given file's current filename.
-      String filename}) async {
+    /// The filename to upload as. If null, defaults to the given file's current filename.
+    String? filename,
+  }) async {
     final endpoint = 'https://$bucket.s3-$region.amazonaws.com';
     final uploadDest = '$destDir/${filename ?? path.basename(file.path)}';
 
@@ -62,7 +61,9 @@ class AwsS3 {
 
       if (res.statusCode == 204) return '$endpoint/$uploadDest';
     } catch (e) {
-      print(e.toString());
+      print('Failed to upload to AWS, with exception:');
+      print(e);
+      return null;
     }
   }
 }
