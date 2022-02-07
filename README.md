@@ -6,7 +6,9 @@ _Heavily_ inspired by [this stackoverflow answer](https://stackoverflow.com/a/54
 
 ## Motivation / Disclaimer
 
-There already exists a number of Flutter plugins for interacting with S3, some of which are more actively maintained. This small library was built because the few I tried either failed to work out of the box, or required the use of a Pool ID and AWS Cognito, which my project doesn't use. YMMV. 
+There already exists a number of Flutter plugins for interacting with S3, some of which are more actively maintained. This small library was built because the few I tried either failed to work out of the box, or required the use of a Pool ID and AWS Cognito, which my project doesn't use. YMMV.
+
+Ability to choose acl policy (public-read,private,etc.) added.
 
 ## Getting Started
 
