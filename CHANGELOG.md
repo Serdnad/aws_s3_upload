@@ -1,4 +1,4 @@
-## [1.2.1] - 2/2/2022
+## [1.3.0] - 2/2/2022
 
 Added enum for acl to be able to choose.
 
