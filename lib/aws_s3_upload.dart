@@ -31,14 +31,14 @@ class AwsS3 {
     /// The AWS region. Must be formatted correctly, e.g. us-west-1
     String region = 'us-east-2',
 
-    ///Access control list enables you to manage access to bucket and objects
-    ///For more information visit [https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html]
+    /// Access control list enables you to manage access to bucket and objects
+    /// For more information visit [https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html]
     ACL acl = ACL.public_read,
 
     /// The filename to upload as. If null, defaults to the given file's current filename.
     String? filename,
   }) async {
-    final endpoint = 'https://$bucket.s3-$region.amazonaws.com';
+    final endpoint = 'https://$bucket.s3.$region.amazonaws.com';
     final uploadDest = '$destDir/${filename ?? path.basename(file.path)}';
 
     final stream = http.ByteStream(Stream.castFrom(file.openRead()));
@@ -51,6 +51,7 @@ class AwsS3 {
 
     final policy = Policy.fromS3PresignedPost(
         uploadDest, bucket, accessKey, 15, length, acl,
+        uploadDest, bucket, accessKey, 15, length,
         region: region);
     final key =
         SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
