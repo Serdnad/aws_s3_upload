@@ -1,3 +1,11 @@
+## [1.2.2] - 2/2/2022
+
+readded gitignore and uploaded properly
+
+## [1.2.1] - 2/2/2022
+
+Added enum for acl to be able to choose.
+
 ## [1.2.0] - 5/9/2021
 
 Null safety and updated dependencies.
