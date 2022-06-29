@@ -25,6 +25,9 @@ class AwsS3 {
 
     /// The file to upload
     required File file,
+    
+    /// The key to save this file as. Will override destDir and filename if set.
+    String? key,
 
     /// The path to upload the file to (e.g. "uploads/public"). Defaults to the root "directory"
     String destDir = '',
@@ -40,7 +43,7 @@ class AwsS3 {
     String? filename,
   }) async {
     final endpoint = 'https://$bucket.s3.$region.amazonaws.com';
-    final uploadDest = '$destDir/${filename ?? path.basename(file.path)}';
+    final uploadKey = key ?? '$destDir/${filename ?? path.basename(file.path)}';
 
     final stream = http.ByteStream(Stream.castFrom(file.openRead()));
     final length = await file.length();
@@ -49,9 +52,9 @@ class AwsS3 {
     final req = http.MultipartRequest("POST", uri);
     final multipartFile = http.MultipartFile('file', stream, length, filename: path.basename(file.path));
 
-    final policy = Policy.fromS3PresignedPost(uploadDest, bucket, accessKey, 15, length, acl, region: region);
-    final key = SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
-    final signature = SigV4.calculateSignature(key, policy.encode());
+    final policy = Policy.fromS3PresignedPost(uploadKey, bucket, accessKey, 15, length, acl, region: region);
+    final signingKey = SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
+    final signature = SigV4.calculateSignature(signingKey, policy.encode());
 
     req.files.add(multipartFile);
     req.fields['key'] = policy.key;
@@ -65,7 +68,7 @@ class AwsS3 {
     try {
       final res = await req.send();
 
-      if (res.statusCode == 204) return '$endpoint/$uploadDest';
+      if (res.statusCode == 204) return '$endpoint/$uploadKey';
     } catch (e) {
       print('Failed to upload to AWS, with exception:');
       print(e);
