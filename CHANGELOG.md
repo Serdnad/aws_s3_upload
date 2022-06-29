@@ -1,3 +1,7 @@
+## [1.3.0] - 6/29/2022
+
+Allow setting ACL and fix endpoint.
+
 ## [1.2.2] - 2/2/2022
 
 readded gitignore and uploaded properly

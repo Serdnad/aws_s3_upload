@@ -1,6 +1,7 @@
 library aws_s3_upload;
 
 import 'dart:io';
+
 import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 import 'package:aws_s3_upload/enum/acl.dart';
 import 'package:aws_s3_upload/src/utils.dart';
@@ -46,15 +47,10 @@ class AwsS3 {
 
     final uri = Uri.parse(endpoint);
     final req = http.MultipartRequest("POST", uri);
-    final multipartFile = http.MultipartFile('file', stream, length,
-        filename: path.basename(file.path));
+    final multipartFile = http.MultipartFile('file', stream, length, filename: path.basename(file.path));
 
-    final policy = Policy.fromS3PresignedPost(
-        uploadDest, bucket, accessKey, 15, length, acl,
-        uploadDest, bucket, accessKey, 15, length,
-        region: region);
-    final key =
-        SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
+    final policy = Policy.fromS3PresignedPost(uploadDest, bucket, accessKey, 15, length, acl, region: region);
+    final key = SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
     final signature = SigV4.calculateSignature(key, policy.encode());
 
     req.files.add(multipartFile);
@@ -68,7 +64,7 @@ class AwsS3 {
 
     try {
       final res = await req.send();
-      
+
       if (res.statusCode == 204) return '$endpoint/$uploadDest';
     } catch (e) {
       print('Failed to upload to AWS, with exception:');
