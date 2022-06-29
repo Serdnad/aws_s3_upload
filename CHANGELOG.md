@@ -1,3 +1,7 @@
+## [1.4.0] - 6/29/2022
+
+Support setting object key directly.
+
 ## [1.3.0] - 6/29/2022
 
 Allow setting ACL and fix endpoint.
