@@ -25,7 +25,7 @@ class AwsS3 {
 
     /// The file to upload
     required File file,
-    
+
     /// The key to save this file as. Will override destDir and filename if set.
     String? key,
 
@@ -41,6 +41,9 @@ class AwsS3 {
 
     /// The filename to upload as. If null, defaults to the given file's current filename.
     String? filename,
+
+    /// The content-type of file to upload. defaults to binary/octet-stream.
+    String contentType = 'binary/octet-stream',
   }) async {
     final endpoint = 'https://$bucket.s3.$region.amazonaws.com';
     final uploadKey = key ?? '$destDir/${filename ?? path.basename(file.path)}';
@@ -50,10 +53,13 @@ class AwsS3 {
 
     final uri = Uri.parse(endpoint);
     final req = http.MultipartRequest("POST", uri);
-    final multipartFile = http.MultipartFile('file', stream, length, filename: path.basename(file.path));
-
-    final policy = Policy.fromS3PresignedPost(uploadKey, bucket, accessKey, 15, length, acl, region: region);
-    final signingKey = SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
+    final multipartFile = http.MultipartFile('file', stream, length,
+        filename: path.basename(file.path));
+    final policy = Policy.fromS3PresignedPost(
+        uploadKey, bucket, accessKey, 15, length, acl,
+        region: region);
+    final signingKey =
+        SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
     final signature = SigV4.calculateSignature(signingKey, policy.encode());
 
     req.files.add(multipartFile);
@@ -64,6 +70,7 @@ class AwsS3 {
     req.fields['X-Amz-Date'] = policy.datetime;
     req.fields['Policy'] = policy.encode();
     req.fields['X-Amz-Signature'] = signature;
+    req.fields['Content-Type'] = contentType;
 
     try {
       final res = await req.send();
