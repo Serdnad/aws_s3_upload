@@ -50,7 +50,16 @@ class AwsS3 {
     Map<String, String>? metadata,
   }) async {
     final endpoint = 'https://$bucket.s3.$region.amazonaws.com';
-    final uploadKey = key ?? '$destDir/${filename ?? path.basename(file.path)}';
+
+    var uploadKey;
+
+    if (key != null) {
+      return key;
+    } else if (destDir.isNotEmpty) {
+      return '$destDir/${filename ?? path.basename(file.path)}';
+    } else {
+      uploadKey = '${filename ?? path.basename(file.path)}';
+    }
 
     final stream = http.ByteStream(Stream.castFrom(file.openRead()));
     final length = await file.length();
