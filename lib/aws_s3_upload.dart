@@ -7,6 +7,7 @@ import 'package:aws_s3_upload/enum/acl.dart';
 import 'package:aws_s3_upload/src/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
+import 'package:recase/recase.dart';
 
 import './src/policy.dart';
 
@@ -46,7 +47,7 @@ class AwsS3 {
     String contentType = 'binary/octet-stream',
 
     /// Additional metadata to be attached to the upload
-    Map<String, dynamic>? metadata,
+    Map<String, String>? metadata,
   }) async {
     final endpoint = 'https://$bucket.s3.$region.amazonaws.com';
     final uploadKey = key ?? '$destDir/${filename ?? path.basename(file.path)}';
@@ -59,8 +60,10 @@ class AwsS3 {
     final multipartFile = http.MultipartFile('file', stream, length,
         filename: path.basename(file.path));
 
-    // Convert metadata to AWS-compliant params.
-    final metadataParams = _convertMetadata(metadata);
+    // Convert metadata to AWS-compliant params before generating the policy.
+    final metadataParams = _convertMetadataToParams(metadata);
+
+    // Generate pre-signed policy.
     final policy = Policy.fromS3PresignedPost(
       uploadKey,
       bucket,
@@ -86,6 +89,7 @@ class AwsS3 {
     req.fields['X-Amz-Signature'] = signature;
     req.fields['Content-Type'] = contentType;
 
+    // If metadata isn't null, add metadata params to the request.
     if (metadata != null) {
       req.fields.addAll(metadataParams);
     }
@@ -101,12 +105,15 @@ class AwsS3 {
     }
   }
 
-  static Map<String, String> _convertMetadata(Map<String, dynamic>? metadata) {
+  /// A method to transform the map keys into the format compliant with AWS.
+  /// AWS requires that each metadata param be sent as `x-amz-meta-*`.
+  static Map<String, String> _convertMetadataToParams(
+      Map<String, String>? metadata) {
     Map<String, String> updatedMetadata = {};
 
     if (metadata != null) {
       for (var k in metadata.keys) {
-        updatedMetadata['x-amz-meta-${k}'] = metadata[k];
+        updatedMetadata['x-amz-meta-${k.paramCase}'] = metadata[k]!;
       }
     }
 

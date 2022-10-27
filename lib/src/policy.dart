@@ -65,22 +65,44 @@ class Policy {
     return base64.encode(bytes);
   }
 
+  List<Map<String, String>> _convertMetadataToPolicyParams(
+      Map<String, dynamic>? metadata) {
+    final List<Map<String, String>> params = [];
+
+    if (metadata != null) {
+      for (var k in metadata.keys) {
+        params.add({k: metadata[k]});
+      }
+    }
+
+    return params;
+  }
+
   @override
   String toString() {
-    return '''
-{ "expiration": "${this.expiration}",
-  "conditions": [
-    {"bucket": "${this.bucket}"},
-    ["starts-with", "\$key", "${this.key}"],
-    ["starts-with", "\$Content-Type", ""],
-    {"acl": "${aclToString(acl)}"},
-    ["content-length-range", 1, ${this.maxFileSize}],
-    {"x-amz-credential": "${this.credential}"},
-    {"x-amz-algorithm": "AWS4-HMAC-SHA256"},
-    {"x-amz-date": "${this.datetime}"},
-    ${jsonEncode(metadata)},
-  ],
-}
-''';
+    final metadataParams = _convertMetadataToPolicyParams(metadata);
+
+    final payload = {
+      "expiration": "${this.expiration}",
+      "conditions": [
+        {"bucket": "${this.bucket}"},
+        ["starts-with", "\$key", "${this.key}"],
+        ["starts-with", "\$Content-Type", ""],
+        {"acl": "${aclToString(acl)}"},
+        ["content-length-range", 1, this.maxFileSize],
+        {"x-amz-credential": "${this.credential}"},
+        {"x-amz-algorithm": "AWS4-HMAC-SHA256"},
+        {"x-amz-date": "${this.datetime}"},
+      ],
+    };
+
+    // If there's metadata, add it to the list of conditions for the policy.
+    if (metadataParams.isNotEmpty) {
+      for (final p in metadataParams) {
+        (payload['conditions'] as List).add(p);
+      }
+    }
+
+    return jsonEncode(payload);
   }
 }
