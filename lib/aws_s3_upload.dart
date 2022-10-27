@@ -58,9 +58,20 @@ class AwsS3 {
     final req = http.MultipartRequest("POST", uri);
     final multipartFile = http.MultipartFile('file', stream, length,
         filename: path.basename(file.path));
+
+    // Convert metadata to AWS-compliant params.
+    final metadataParams = _convertMetadata(metadata);
     final policy = Policy.fromS3PresignedPost(
-        uploadKey, bucket, accessKey, 15, length, acl,
-        region: region);
+      uploadKey,
+      bucket,
+      accessKey,
+      15,
+      length,
+      acl,
+      region: region,
+      metadata: metadataParams,
+    );
+
     final signingKey =
         SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
     final signature = SigV4.calculateSignature(signingKey, policy.encode());
@@ -76,9 +87,7 @@ class AwsS3 {
     req.fields['Content-Type'] = contentType;
 
     if (metadata != null) {
-      for (var k in metadata.keys) {
-        req.fields['x-amz-meta-${k}'] = metadata[k];
-      }
+      req.fields.addAll(metadataParams);
     }
 
     try {
@@ -90,5 +99,17 @@ class AwsS3 {
       print(e);
       return null;
     }
+  }
+
+  static Map<String, String> _convertMetadata(Map<String, dynamic>? metadata) {
+    Map<String, String> updatedMetadata = {};
+
+    if (metadata != null) {
+      for (var k in metadata.keys) {
+        updatedMetadata['x-amz-meta-${k}'] = metadata[k];
+      }
+    }
+
+    return updatedMetadata;
   }
 }

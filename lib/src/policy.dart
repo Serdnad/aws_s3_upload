@@ -13,14 +13,30 @@ class Policy {
   String credential;
   String datetime;
   int maxFileSize;
+  Map<String, dynamic>? metadata;
 
-  Policy(this.key, this.bucket, this.datetime, this.expiration, this.credential,
-      this.maxFileSize, this.acl,
-      {this.region = 'us-east-2'});
+  Policy(
+    this.key,
+    this.bucket,
+    this.datetime,
+    this.expiration,
+    this.credential,
+    this.maxFileSize,
+    this.acl, {
+    this.region = 'us-east-2',
+    this.metadata,
+  });
 
-  factory Policy.fromS3PresignedPost(String key, String bucket,
-      String accessKeyId, int expiryMinutes, int maxFileSize, ACL acl,
-      {String region = 'us-east-2'}) {
+  factory Policy.fromS3PresignedPost(
+    String key,
+    String bucket,
+    String accessKeyId,
+    int expiryMinutes,
+    int maxFileSize,
+    ACL acl, {
+    String region = 'us-east-2',
+    Map<String, dynamic>? metadata,
+  }) {
     final datetime = SigV4.generateDatetime();
     final expiration = (DateTime.now())
         .add(Duration(minutes: expiryMinutes))
@@ -31,8 +47,17 @@ class Policy {
     final cred =
         '$accessKeyId/${SigV4.buildCredentialScope(datetime, region, 's3')}';
 
-    return Policy(key, bucket, datetime, expiration, cred, maxFileSize, acl,
-        region: region);
+    return Policy(
+      key,
+      bucket,
+      datetime,
+      expiration,
+      cred,
+      maxFileSize,
+      acl,
+      region: region,
+      metadata: metadata,
+    );
   }
 
   String encode() {
@@ -52,8 +77,9 @@ class Policy {
     ["content-length-range", 1, ${this.maxFileSize}],
     {"x-amz-credential": "${this.credential}"},
     {"x-amz-algorithm": "AWS4-HMAC-SHA256"},
-    {"x-amz-date": "${this.datetime}" }
-  ]
+    {"x-amz-date": "${this.datetime}"},
+    ${jsonEncode(metadata)},
+  ],
 }
 ''';
   }
