@@ -44,6 +44,9 @@ class AwsS3 {
 
     /// The content-type of file to upload. defaults to binary/octet-stream.
     String contentType = 'binary/octet-stream',
+
+    /// Additional metadata to be attached to the upload
+    Map<String, dynamic>? metadata,
   }) async {
     final endpoint = 'https://$bucket.s3.$region.amazonaws.com';
     final uploadKey = key ?? '$destDir/${filename ?? path.basename(file.path)}';
@@ -71,6 +74,12 @@ class AwsS3 {
     req.fields['Policy'] = policy.encode();
     req.fields['X-Amz-Signature'] = signature;
     req.fields['Content-Type'] = contentType;
+
+    if (metadata != null) {
+      for (var k in metadata.keys) {
+        req.fields['x-amz-meta-${k}'] = metadata[k];
+      }
+    }
 
     try {
       final res = await req.send();
