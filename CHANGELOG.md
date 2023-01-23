@@ -1,3 +1,7 @@
+## [1.5.0] - 1/22/2023
+
+Support including metadata in uploads.
+
 ## [1.4.0] - 6/29/2022
 
 Support setting object key directly.
