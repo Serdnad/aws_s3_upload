@@ -7,6 +7,7 @@ import 'package:aws_s3_upload/enum/acl.dart';
 import 'package:aws_s3_upload/src/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
+import 'package:recase/recase.dart';
 
 import './src/policy.dart';
 
@@ -44,9 +45,21 @@ class AwsS3 {
 
     /// The content-type of file to upload. defaults to binary/octet-stream.
     String contentType = 'binary/octet-stream',
+
+    /// Additional metadata to be attached to the upload
+    Map<String, String>? metadata,
   }) async {
     final endpoint = 'https://$bucket.s3.$region.amazonaws.com';
-    final uploadKey = key ?? '$destDir/${filename ?? path.basename(file.path)}';
+
+    var uploadKey;
+
+    if (key != null) {
+      uploadKey = key;
+    } else if (destDir.isNotEmpty) {
+      uploadKey = '$destDir/${filename ?? path.basename(file.path)}';
+    } else {
+      uploadKey = '${filename ?? path.basename(file.path)}';
+    }
 
     final stream = http.ByteStream(Stream.castFrom(file.openRead()));
     final length = await file.length();
@@ -55,9 +68,22 @@ class AwsS3 {
     final req = http.MultipartRequest("POST", uri);
     final multipartFile = http.MultipartFile('file', stream, length,
         filename: path.basename(file.path));
+
+    // Convert metadata to AWS-compliant params before generating the policy.
+    final metadataParams = _convertMetadataToParams(metadata);
+
+    // Generate pre-signed policy.
     final policy = Policy.fromS3PresignedPost(
-        uploadKey, bucket, accessKey, 15, length, acl,
-        region: region);
+      uploadKey,
+      bucket,
+      accessKey,
+      15,
+      length,
+      acl,
+      region: region,
+      metadata: metadataParams,
+    );
+
     final signingKey =
         SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
     final signature = SigV4.calculateSignature(signingKey, policy.encode());
@@ -72,6 +98,11 @@ class AwsS3 {
     req.fields['X-Amz-Signature'] = signature;
     req.fields['Content-Type'] = contentType;
 
+    // If metadata isn't null, add metadata params to the request.
+    if (metadata != null) {
+      req.fields.addAll(metadataParams);
+    }
+
     try {
       final res = await req.send();
 
@@ -81,5 +112,20 @@ class AwsS3 {
       print(e);
       return null;
     }
+  }
+
+  /// A method to transform the map keys into the format compliant with AWS.
+  /// AWS requires that each metadata param be sent as `x-amz-meta-*`.
+  static Map<String, String> _convertMetadataToParams(
+      Map<String, String>? metadata) {
+    Map<String, String> updatedMetadata = {};
+
+    if (metadata != null) {
+      for (var k in metadata.keys) {
+        updatedMetadata['x-amz-meta-${k.paramCase}'] = metadata[k]!;
+      }
+    }
+
+    return updatedMetadata;
   }
 }

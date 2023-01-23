@@ -8,12 +8,12 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  amazon_cognito_identity_dart_2: ^1.0.3
   flutter:
     sdk: flutter
-
-  amazon_cognito_identity_dart_2: ^1.0.3
   http: ^0.13.3
   path: ^1.8.0
+  recase: ^4.1.0
 
 dev_dependencies:
   flutter_test:
@@ -21,6 +21,5 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
 # The following section is specific to Flutter.
-flutter:
+flutter: null

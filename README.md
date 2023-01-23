@@ -19,6 +19,7 @@ AwsS3.uploadFile(
   secretKey: "xxxxxxxxxxxxxxxxxxxxxxxxxx",
   file: File("path_to_file"),
   bucket: "bucket_name",
-  region: "us-east-2"
+  region: "us-east-2",
+  metadata: {"test": "test"} // optional
 );
 ```
