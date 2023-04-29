@@ -46,6 +46,9 @@ class AwsS3 {
     /// The content-type of file to upload. defaults to binary/octet-stream.
     String contentType = 'binary/octet-stream',
 
+    /// HTTP method option. default to POST.
+    String method = 'POST',
+
     /// Additional metadata to be attached to the upload
     Map<String, String>? metadata,
   }) async {
@@ -65,7 +68,7 @@ class AwsS3 {
     final length = await file.length();
 
     final uri = Uri.parse(endpoint);
-    final req = http.MultipartRequest("POST", uri);
+    final req = http.MultipartRequest(method, uri);
     final multipartFile = http.MultipartFile('file', stream, length,
         filename: path.basename(file.path));
 
