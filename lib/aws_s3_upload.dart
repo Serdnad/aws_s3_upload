@@ -46,10 +46,17 @@ class AwsS3 {
     /// The content-type of file to upload. defaults to binary/octet-stream.
     String contentType = 'binary/octet-stream',
 
+    /// If set to true, https is used instead of http. Default is true.
+    bool useSSL = true,
+
     /// Additional metadata to be attached to the upload
     Map<String, String>? metadata,
   }) async {
-    final endpoint = 'https://$bucket.s3.$region.amazonaws.com';
+    var httpStr = 'http';
+    if (useSSL) {
+      httpStr += 's';
+    }
+    final endpoint = '$httpStr://$bucket.s3.$region.amazonaws.com';
 
     var uploadKey;
 
