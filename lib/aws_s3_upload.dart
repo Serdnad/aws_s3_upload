@@ -43,13 +43,20 @@ class AwsS3 {
     /// The filename to upload as. If null, defaults to the given file's current filename.
     String? filename,
 
+    /// If it is a static website. Defaults to the false
+    bool isStatitWebSite = false,
+
     /// The content-type of file to upload. defaults to binary/octet-stream.
     String contentType = 'binary/octet-stream',
 
     /// Additional metadata to be attached to the upload
     Map<String, String>? metadata,
   }) async {
-    final endpoint = 'https://$bucket.s3.$region.amazonaws.com';
+    var s3 = `s3.`;
+    if (isStaticWebSite) {
+      s3 = 's3-website-'; // or 's3-website.'
+    }
+    final endpoint = 'https://$bucket.$s3$region.amazonaws.com';
 
     var uploadKey;
 
