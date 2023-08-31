@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 import 'package:aws_s3_upload/enum/acl.dart';
 import 'package:aws_s3_upload/src/utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:recase/recase.dart';
@@ -115,10 +116,11 @@ class AwsS3 {
 
       if (res.statusCode == 204) return '$endpoint/$uploadKey';
     } catch (e) {
-      print('Failed to upload to AWS, with exception:');
-      print(e);
+      debugPrint('Failed to upload to AWS, with exception:');
+      debugPrint(e.toString());
       return null;
     }
+    return null;
   }
 
   /// A method to transform the map keys into the format compliant with AWS.
