@@ -58,7 +58,7 @@ class AwsS3 {
     }
     final endpoint = '$httpStr://$bucket.s3.$region.amazonaws.com';
 
-    var uploadKey;
+    String? uploadKey;
 
     if (key != null) {
       uploadKey = key;
