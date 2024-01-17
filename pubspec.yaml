@@ -1,6 +1,6 @@
 name: aws_s3_upload
 description: A simple, convenient package for uploading to S3.
-version: 1.5.0
+version: 1.5.1
 homepage: https://github.com/Serdnad/aws_s3_upload
 
 environment:
@@ -11,8 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  amazon_cognito_identity_dart_2: ^1.0.3
-  http: ^0.13.3
+  amazon_cognito_identity_dart_2: ^3.5.0
+  http: ^1.1.0
   path: ^1.8.0
   recase: ^4.1.0
 
