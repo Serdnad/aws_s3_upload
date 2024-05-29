@@ -36,6 +36,10 @@ class AwsS3 {
     /// The AWS region. Must be formatted correctly, e.g. us-west-1
     String region = 'us-east-2',
 
+    /// The domain of the bucket. Defaults to 'amazonaws.com'
+    /// You can also use 'linodeobjects.com' for Linode's object storage.
+    String domain = 'amazonaws.com',
+
     /// Access control list enables you to manage access to bucket and objects
     /// For more information visit [https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html]
     ACL acl = ACL.public_read,
@@ -56,7 +60,10 @@ class AwsS3 {
     if (useSSL) {
       httpStr += 's';
     }
-    final endpoint = '$httpStr://$bucket.s3.$region.amazonaws.com';
+    bool isUsingAmazonDomain = domain == 'amazonaws.com';
+    final endpoint = '$httpStr://$bucket.${isUsingAmazonDomain
+        ? 's3.'
+        : ''}$region.$domain';
 
     String? uploadKey;
 
