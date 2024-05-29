@@ -128,6 +128,7 @@ class AwsS3 {
     } catch (e) {
       throw('Failed to upload to AWS, with exception: $e');
     }
+    return null;
   }
 
   /// A method to transform the map keys into the format compliant with AWS.
