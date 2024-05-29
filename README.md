@@ -1,5 +1,9 @@
 # aws_s3_upload
 
+Added Support of [Linode](https://cloud.linode.com/) <br>
+Now you can pass custom domain (e.g linodeobjects.com) to 'domain' parameter.
+----------------------------
+
 A simple, convenient package for uploading to S3.
 
 _Heavily_ inspired by [this stackoverflow answer](https://stackoverflow.com/a/54983831/2330228)
@@ -15,6 +19,7 @@ AwsS3.uploadFile(
   file: File("path_to_file"),
   bucket: "bucket_name",
   region: "us-east-2",
+  domain: "linodeobjects.com", // optional - Default: amazonaws.com
   metadata: {"test": "test"} // optional
 );
 ```
