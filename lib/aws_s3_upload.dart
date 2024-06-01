@@ -36,6 +36,10 @@ class AwsS3 {
     /// The AWS region. Must be formatted correctly, e.g. us-west-1
     String region = 'us-east-2',
 
+    /// The domain of the bucket. Defaults to 'amazonaws.com'
+    /// You can also use 'linodeobjects.com' for Linode's object storage.
+    String domain = 'amazonaws.com',
+
     /// Access control list enables you to manage access to bucket and objects
     /// For more information visit [https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html]
     ACL acl = ACL.public_read,
@@ -56,7 +60,10 @@ class AwsS3 {
     if (useSSL) {
       httpStr += 's';
     }
-    final endpoint = '$httpStr://$bucket.s3.$region.amazonaws.com';
+    bool isUsingAmazonDomain = domain == 'amazonaws.com';
+    final endpoint = '$httpStr://$bucket.${isUsingAmazonDomain
+        ? 's3.'
+        : ''}$region.$domain';
 
     String? uploadKey;
 
@@ -72,9 +79,12 @@ class AwsS3 {
     final length = await file.length();
 
     final uri = Uri.parse(endpoint);
-    final req = http.MultipartRequest("POST", uri);
-    final multipartFile = http.MultipartFile('file', stream, length,
-        filename: path.basename(file.path));
+    final multipartFile = http.MultipartFile(
+      'file',
+      stream,
+      length,
+      filename: path.basename(file.path),
+    );
 
     // Convert metadata to AWS-compliant params before generating the policy.
     final metadataParams = _convertMetadataToParams(metadata);
@@ -95,15 +105,16 @@ class AwsS3 {
         SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
     final signature = SigV4.calculateSignature(signingKey, policy.encode());
 
-    req.files.add(multipartFile);
-    req.fields['key'] = policy.key;
-    req.fields['acl'] = aclToString(acl);
-    req.fields['X-Amz-Credential'] = policy.credential;
-    req.fields['X-Amz-Algorithm'] = 'AWS4-HMAC-SHA256';
-    req.fields['X-Amz-Date'] = policy.datetime;
-    req.fields['Policy'] = policy.encode();
-    req.fields['X-Amz-Signature'] = signature;
-    req.fields['Content-Type'] = contentType;
+    final req = http.MultipartRequest('POST', uri)
+      ..files.add(multipartFile)
+      ..fields['key'] = policy.key
+      ..fields['acl'] = aclToString(acl)
+      ..fields['X-Amz-Credential'] = policy.credential
+      ..fields['X-Amz-Algorithm'] = 'AWS4-HMAC-SHA256'
+      ..fields['X-Amz-Date'] = policy.datetime
+      ..fields['Policy'] = policy.encode()
+      ..fields['X-Amz-Signature'] = signature
+      ..fields['Content-Type'] = contentType;
 
     // If metadata isn't null, add metadata params to the request.
     if (metadata != null) {
@@ -115,10 +126,9 @@ class AwsS3 {
 
       if (res.statusCode == 204) return '$endpoint/$uploadKey';
     } catch (e) {
-      print('Failed to upload to AWS, with exception:');
-      print(e);
-      return null;
+      throw('Failed to upload to AWS, with exception: $e');
     }
+    return null;
   }
 
   /// A method to transform the map keys into the format compliant with AWS.
