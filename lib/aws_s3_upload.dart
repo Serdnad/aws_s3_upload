@@ -119,6 +119,7 @@ class AwsS3 {
       print(e);
       return null;
     }
+    return null;
   }
 
   /// A method to transform the map keys into the format compliant with AWS.
