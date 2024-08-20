@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 import 'package:aws_s3_upload/enum/acl.dart';
 import 'package:aws_s3_upload/src/utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:recase/recase.dart';
@@ -73,8 +74,8 @@ class AwsS3 {
 
     final uri = Uri.parse(endpoint);
     final req = http.MultipartRequest("POST", uri);
-    final multipartFile = http.MultipartFile('file', stream, length,
-        filename: path.basename(file.path));
+    final multipartFile =
+        http.MultipartFile('file', stream, length, filename: path.basename(file.path));
 
     // Convert metadata to AWS-compliant params before generating the policy.
     final metadataParams = _convertMetadataToParams(metadata);
@@ -91,8 +92,7 @@ class AwsS3 {
       metadata: metadataParams,
     );
 
-    final signingKey =
-        SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
+    final signingKey = SigV4.calculateSigningKey(secretKey, policy.datetime, region, 's3');
     final signature = SigV4.calculateSignature(signingKey, policy.encode());
 
     req.files.add(multipartFile);
@@ -115,8 +115,8 @@ class AwsS3 {
 
       if (res.statusCode == 204) return '$endpoint/$uploadKey';
     } catch (e) {
-      print('Failed to upload to AWS, with exception:');
-      print(e);
+      debugPrint('Failed to upload to AWS, with exception:');
+      debugPrint(e.toString());
       return null;
     }
     return null;
@@ -124,8 +124,7 @@ class AwsS3 {
 
   /// A method to transform the map keys into the format compliant with AWS.
   /// AWS requires that each metadata param be sent as `x-amz-meta-*`.
-  static Map<String, String> _convertMetadataToParams(
-      Map<String, String>? metadata) {
+  static Map<String, String> _convertMetadataToParams(Map<String, String>? metadata) {
     Map<String, String> updatedMetadata = {};
 
     if (metadata != null) {
